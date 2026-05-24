@@ -3,6 +3,7 @@ const router  = express.Router();
 const { snap, core } = require('../config/midtrans');
 const prisma  = require('../config/prisma');
 const crypto  = require('crypto');
+const authGuard = require('../middleware/authGuard')
 
 // =============================================
 // POST /api/payment/create-transaction
@@ -101,7 +102,7 @@ router.post('/notification', async (req, res) => {
 // =============================================
 // GET /api/payment/orders
 // =============================================
-router.get('/orders', async (req, res) => {
+router.get('/orders', authGuard, async (req, res) => {
   try {
     const orders = await prisma.order.findMany({ include: { items: true, payment: true }, orderBy: { createdAt: 'desc' } });
     const formatted = orders.map(o => ({
@@ -122,7 +123,7 @@ router.get('/orders', async (req, res) => {
 // =============================================
 // PATCH /api/payment/orders/:orderId/status
 // =============================================
-router.patch('/orders/:orderId/status', async (req, res) => {
+router.patch('/orders/:orderId/status', authGuard, async (req, res) => {
   try {
     const { orderId } = req.params;
     const { orderStatus } = req.body;
@@ -151,7 +152,7 @@ router.get('/menu', async (req, res) => {
 // =============================================
 // GET /api/payment/stats
 // =============================================
-router.get('/stats', async (req, res) => {
+router.get('/stats',authGuard, async (req, res) => {
   try {
     const [totalOrders, paidOrders, queueOrders] = await Promise.all([
       prisma.order.count(),

@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors    = require('cors');
 const app     = express();
+const authRoutes = require('./routes/auth')
 
 app.use(cors({
   origin: function(origin, callback) {
@@ -23,6 +24,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));
+app.use('/api/auth', authRoutes)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -31,12 +33,38 @@ app.use((req, res, next) => {
   next();
 });
 
+const paymentRoutes = require('./routes/payment')
+const authRoutes    = require('./routes/auth')    
+
+app.use('/api/payment', paymentRoutes)
+app.use('/api/auth', authRoutes)    
+
 const paymentRoutes = require('./routes/payment');
 app.use('/api/payment', paymentRoutes);
 
 app.get('/', (req, res) => {
-  res.json({ status: 'ok', app: 'MieGo Backend' });
-});
+  res.json({
+    status: 'ok',
+    app: 'MieGo Backend',
+    version: '2.1.0',
+    endpoints: {
+      auth: {
+        login  : 'POST /api/auth/login',
+        me     : 'GET  /api/auth/me',
+        logout : 'POST /api/auth/logout',
+      },
+      payment: {
+        createTransaction : 'POST /api/payment/create-transaction',
+        checkStatus       : 'GET  /api/payment/status/:orderId',
+        notification      : 'POST /api/payment/notification',
+        orders            : 'GET  /api/payment/orders  [AUTH]',
+        updateStatus      : 'PATCH /api/payment/orders/:id/status  [AUTH]',
+        stats             : 'GET  /api/payment/stats  [AUTH]',
+        menu              : 'GET  /api/payment/menu',
+      },
+    },
+  })
+})
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
