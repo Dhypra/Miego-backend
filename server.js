@@ -3,7 +3,26 @@ const express = require('express');
 const cors    = require('cors');
 const app     = express();
 
-app.use(cors({ origin: '*', methods: ['GET','POST','PATCH','DELETE'], allowedHeaders: ['Content-Type','Authorization'] }));
+app.use(cors({
+  origin: function(origin, callback) {
+    // Izinkan semua subdomain vercel.app dan localhost
+    const allowed = [
+      'https://miego-fe.vercel.app',
+      'https://miego-4b17bp5sw-dhypras-projects.vercel.app',
+      'https://miego-hmeeh3fxo-dhypras-projects.vercel.app',
+      'http://localhost:5173',
+      'http://localhost:5500',
+    ];
+    if (!origin || allowed.includes(origin) || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
