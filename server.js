@@ -39,6 +39,9 @@ app.get('/', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🍜 MieGo Backend jalan di http://localhost:${PORT}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`\n🍜 MieGo Backend berjalan!`);
+  console.log(`   URL  : http://localhost:${PORT}`);
+  console.log(`   Mode : ${process.env.NODE_ENV || 'development'}\n`);
 });
